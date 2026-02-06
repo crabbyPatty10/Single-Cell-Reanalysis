@@ -67,7 +67,7 @@ def main() -> None:
     # 5) Write output
     outdir = ROOT / "results" / "tables"
     outdir.mkdir(parents=True, exist_ok=True)
-    outpath = outdir / "state_summary.tsv"
+    outpath = outdir / "state_summary__SMOKETEST.tsv"
     out.to_csv(outpath, sep="\t", index=False)
 
     print(f"Wrote {outpath}")

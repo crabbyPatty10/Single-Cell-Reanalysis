@@ -1,2 +1,7 @@
 .ipynb_checkpoints/
+# Generated outputs (reproducible; keep repo clean)
+results/tables/*.tsv
+results/figures/*
+!results/tables/.gitkeep
+!results/figures/.gitkeep
 
