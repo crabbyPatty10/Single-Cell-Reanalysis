@@ -13,6 +13,7 @@ dependencies:
   - anndata
   - jupyterlab
   - ipykernel
+  - lxml
   - tqdm
   - pip:
       - gseapy
