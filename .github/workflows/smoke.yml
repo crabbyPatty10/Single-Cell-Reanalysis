@@ -1,0 +1,25 @@
+name: smoke-test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup micromamba (conda-forge)
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          cache-environment: true
+
+      - name: Run smoke pipeline
+        shell: bash -l {0}
+        run: |
+          python src/pipeline/make_toy_data.py
+          python src/pipeline/run.py --config configs/smoke.yaml
