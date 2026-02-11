@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it."
+title: "Single-Cell Reanalysis"
+authors:
+  - family-names: "Pat"
+date-released: "2026-02-11"
+repository-code: "https://github.com/crabbyPatty10/Single-Cell-Reanalysis"
+license: "MIT"
+keywords:
+  - single-cell
+  - scRNA-seq
+  - reproducibility
+  - scanpy
