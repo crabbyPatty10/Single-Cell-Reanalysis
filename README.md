@@ -2,6 +2,10 @@
 
 # Single-Cell Reanalysis
 
+- Results: `docs/Results.md`
+- Methods: `docs/Methods.md`
+- Data acquisition: `docs/Data_Acquisition.md`
+
 ## Quickstart
 
 Smoke test (no real data required):
@@ -16,37 +20,68 @@ Full run (requires discovery inputs; see `docs/Data_Acquisition.md`):
     conda activate scr_smoke
     python scripts/run_full.py --config configs/full.yaml
 
-## Smoke test (end-to-end)
-This repo includes a minimal, end-to-end smoke test to confirm the pipeline runs start -> finish.
+---
 
-### 1) Create environment (Windows / conda)
+## Environment setup (recommended)
+
+This repo uses a pinned conda-forge environment.
+
+1) Create the environment:
+
+    conda env create -f environment.yml
+
+2) Activate it:
+
+    conda activate scr_smoke
+
+3) Quick import check:
+
+    python -c "import numpy, pandas, scanpy, anndata; print('ok')"
+
+### Alternative: manual environment creation
+
+If you prefer not to use `environment.yml`, you can create the environment manually:
+
     conda create -n scr_smoke -c conda-forge python=3.11 scanpy anndata python-igraph leidenalg pyyaml matplotlib pandas numpy -y
     conda activate scr_smoke
 
-### 2) Generate toy data
+---
+
+## Smoke test (end-to-end)
+
+This repo includes a minimal, end-to-end smoke test to confirm the pipeline runs start -> finish.
+
+1) Generate toy data:
+
     python src/pipeline/make_toy_data.py
 
-### 3) Run pipeline
+2) Run pipeline:
+
     python src/pipeline/run.py --config configs/smoke.yaml
 
-### Outputs
-- outputs/processed_smoke.h5ad
-- reports/smoke/qc_summary.csv
-- reports/smoke/qc_violin.png
-- reports/smoke/qc_counts_vs_mito.png
-- reports/smoke/umap_leiden.png
+Outputs (not committed to git):
+- `outputs/processed_smoke.h5ad`
+- `reports/smoke/qc_summary.csv`
+- `reports/smoke/qc_violin.png`
+- `reports/smoke/qc_counts_vs_mito.png`
+- `reports/smoke/umap_leiden.png`
+
+---
 
 ## Full analysis run (discovery + validation figures)
+
 From the repo root, with the analysis environment activated:
 
     conda activate scr_smoke
     python scripts/run_full.py --config configs/full.yaml
 
 This regenerates:
-- results/tables/state_summary.tsv
-- results/tables/paired_subject_deltas.tsv
-- results/figures/fig1*.png
-- results/figures/figV*.png (if validation tables exist)
+- `results/tables/state_summary.tsv`
+- `results/tables/paired_subject_deltas.tsv`
+- `results/figures/fig1*.png`
+- `results/figures/figV*.png` (if validation tables exist)
+
+---
 
 ## Data required (not included in repo)
 
@@ -83,21 +118,3 @@ If you already generated validation tables for **GSE298464**, place them under:
 - `results/tables/validation_gse298464/`
 
 `run_full.py` will generate validation figures **only if** the required TSV tables exist in that folder.
-
-## Environment setup (recommended)
-
-This repo uses a pinned conda-forge environment.
-
-1) Create the environment:
-
-    conda env create -f environment.yml
-
-2) Activate it:
-
-    conda activate scr_smoke
-
-3) Quick import check:
-
-    python -c "import numpy, pandas, scanpy, anndata; print('ok')"
-
-
