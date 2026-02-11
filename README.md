@@ -36,6 +36,8 @@ This regenerates:
 
 ## Data required (not included in repo)
 
+See `docs/Data_Acquisition.md` for detailed setup instructions.
+
 You can run the **smoke test** end-to-end with the toy dataset (no private data).
 To reproduce the **full discovery analysis** (and optional validation figures), you must provide the following inputs locally.
 
