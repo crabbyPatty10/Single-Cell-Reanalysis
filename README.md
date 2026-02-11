@@ -31,3 +31,38 @@ This regenerates:
 - results/tables/paired_subject_deltas.tsv
 - results/figures/fig1*.png
 - results/figures/figV*.png (if validation tables exist)
+
+## Data required (not included in repo)
+
+You can run the **smoke test** end-to-end with the toy dataset (no private data).
+To reproduce the **full discovery analysis** (and optional validation figures), you must provide the following inputs locally.
+
+### Discovery inputs (required for full run)
+
+Expected paths:
+
+- `data/discovery/taurus_v3/myeloid_final.h5ad`
+- `data/discovery/taurus_v3/samples.tsv`
+- `src/gene_sets/hallmark_selected.gmt` (already in repo)
+
+`samples.tsv` must be whitespace- or tab-delimited and include columns:
+
+- `sample_id`
+- `subject_id`
+- `timepoint`
+- `response` (optional but recommended)
+
+Note: `scripts/run_full.py` will automatically create:
+
+- `data/discovery/taurus_v3/paired_for_run_discovery.tsv`
+
+from `samples.tsv` if it does not already exist.
+
+### Validation outputs (optional)
+
+If you already generated validation tables for **GSE298464**, place them under:
+
+- `results/tables/validation_gse298464/`
+
+`run_full.py` will generate validation figures **only if** the required TSV tables exist in that folder.
+
