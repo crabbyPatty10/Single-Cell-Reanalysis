@@ -2,6 +2,20 @@
 
 # Single-Cell Reanalysis
 
+## Quickstart
+
+Smoke test (no real data required):
+
+    conda env create -f environment.yml
+    conda activate scr_smoke
+    python src/pipeline/make_toy_data.py
+    python src/pipeline/run.py --config configs/smoke.yaml
+
+Full run (requires discovery inputs; see `docs/Data_Acquisition.md`):
+
+    conda activate scr_smoke
+    python scripts/run_full.py --config configs/full.yaml
+
 ## Smoke test (end-to-end)
 This repo includes a minimal, end-to-end smoke test to confirm the pipeline runs start -> finish.
 
