@@ -47,3 +47,32 @@ TAURUS (processed myeloid-only AnnData: `myeloid_final.h5ad`) with paired sample
 
 ### Interpretation (quick)
 In the TAURUS discovery cohort (32 paired subjects), the MITO_ROS-high fraction generally decreased from pre to post in both responders and nonresponders. Changes in this state did not track strongly with changes in the fraction of inflamed biopsies, suggesting the MITO/ROS program is not simply a proxy for inflammation status in this small sample. Mean ROS and mean OXPHOS module scores also shifted downward post-treatment, with larger decreases in the remission group.
+
+
+---
+
+## 2026-02-09 — GSE298464 validation run (build + myeloid + Figure V1/V2)
+
+### Validation dataset
+GSE298464 (UC; IFX anti-TNF-α; 8 subjects with Pre/Post biopsies; 16 samples total).
+Built a combined raw AnnData from GEO matrices, created `samples.tsv`, then extracted myeloid cells.
+
+Key files (generated locally; not committed):
+- `data/validation/gse298464/gse298464_raw_combined.h5ad` (all cells combined)
+- `data/validation/gse298464/gse298464_myeloid.h5ad` (myeloid-only after QC/marker filtering)
+
+Tables:
+- `results/tables/validation_gse298464/state_summary.tsv` (per sample)
+- `results/tables/validation_gse298464/paired_subject_deltas.tsv` (paired subject Post−Pre deltas; n=8)
+
+Figures:
+- `results/figures/figV1_gse298464_mito_ros_by_group.png` (pct_high_MITO_ROS by response × timepoint)
+- `results/figures/figV2_gse298464_mito_ros_delta.png` (paired Δ(Post−Pre) %MITO_ROS-high by response)
+
+### Validation paired-delta result (n=8 subjects; 4 Remission, 4 Non_Remission)
+Median Δ(Post−Pre) %MITO_ROS-high:
+- Non_Remission: +1.85
+- Remission: +2.23
+
+Interpretation: In this validation cohort, %MITO_ROS-high tends to increase from Pre→Post in both groups (direction differs from TAURUS), suggesting cohort/processing differences or that the MITO_ROS definition may not be directly portable without additional harmonization checks.
+
