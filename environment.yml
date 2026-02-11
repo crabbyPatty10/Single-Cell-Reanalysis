@@ -1,21 +1,15 @@
-name: ibd-antitnf
+name: scr_smoke
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - pip
+  - anndata
+  - leidenalg
+  - matplotlib
   - numpy
   - pandas
-  - scipy
-  - matplotlib
-  - statsmodels
+  - python-igraph
+  - python=3.11
+  - pyyaml
   - scanpy
-  - anndata
-  - jupyterlab
-  - ipykernel
-  - lxml
-  - tqdm
-  - pip:
-      - gseapy
-      - pydeseq2
+  - libblas[build=*openblas]
 
