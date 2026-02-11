@@ -1,0 +1,14 @@
+discovery:
+  h5ad: data/discovery/taurus_v3/myeloid_final.h5ad
+  samples_tsv: data/discovery/taurus_v3/samples.tsv
+  paired_out: data/discovery/taurus_v3/paired_for_run_discovery.tsv
+  gmt: src/gene_sets/hallmark_selected.gmt
+
+outputs:
+  tables_dir: results/tables
+  figures_dir: results/figures
+
+validation:
+  enabled: true
+  tables_dir: results/tables/validation_gse298464
+  figures_dir: results/figures

@@ -296,7 +296,7 @@ def main() -> None:
     ap.add_argument("--paired", required=False, help="Path to paired/sample table TSV/CSV (must include sample_id, subject_id, timepoint)")
     ap.add_argument("--gmt", required=True, help="Path to hallmark_selected.gmt")
     ap.add_argument("--outdir", default="results/tables", help="Output directory for TSV tables")
-    ap.add_argument("--q", type=float, default=0.8, help="Quantile cutoff for state-high (default 0.8 => top 20%)")
+    ap.add_argument("--q", type=float, default=0.8, help="Quantile cutoff for state-high (default 0.8 => top 20%%)")
     args = ap.parse_args()
 
     outdir = Path(args.outdir)
