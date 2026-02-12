@@ -1,50 +1,125 @@
-import os
+from pathlib import Path
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
+TABLE_WITH_META = Path("results/tables/paired_subject_deltas_with_metadata.tsv")
+TABLE_BASE = Path("results/tables/paired_subject_deltas.tsv")
+
+FIG_DIR = Path("results/figures")
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+
+OUT_FIG1 = FIG_DIR / "fig1_mito_ros_delta.png"
+OUT_FIG1B = FIG_DIR / "fig1b_mito_ros_vs_inflammation.png"
+
+def load_deltas():
+    if TABLE_WITH_META.exists():
+        df = pd.read_csv(TABLE_WITH_META, sep="\t")
+        src = TABLE_WITH_META.as_posix()
+    else:
+        df = pd.read_csv(TABLE_BASE, sep="\t")
+        src = TABLE_BASE.as_posix()
+    return df, src
 
 def main():
-    # Always run relative to repo root
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir(repo_root)
-    os.makedirs(r"results\figures", exist_ok=True)
+    df, src = load_deltas()
 
-    deltas = pd.read_csv(r"results\tables\paired_subject_deltas.tsv", sep="\t")
+    # Required columns
+    ycol = "delta_pct_high_MITO_ROS"
+    xcol = "delta_frac_inflamed"
 
-    # --- Figure 1: delta MITO_ROS-high by response ---
-    nr = deltas.loc[deltas["resp_group"] == "Non_Remission", "delta_pct_high_MITO_ROS"].dropna()
-    rr = deltas.loc[deltas["resp_group"] == "Remission", "delta_pct_high_MITO_ROS"].dropna()
+    if ycol not in df.columns:
+        raise ValueError(f"Missing required column: {ycol} (source: {src})")
 
-    print("Fig1 medians:",
-          "Non_Remission", float(nr.median()), "|",
-          "Remission", float(rr.median()))
+    # ----------------------------
+    # Figure 1: MITO/ROS-high delta by response (if available) else pooled distribution
+    # ----------------------------
+    plt.figure(figsize=(7.2, 5.0))
+    ax = plt.gca()
 
-    plt.figure()
-    plt.boxplot([nr, rr], tick_labels=["Non_Remission", "Remission"], showfliers=True)
-    plt.axhline(0, linewidth=1)
-    plt.ylabel("Delta(Post - Pre) % MITO_ROS-high (myeloid)")
-    plt.title("TAURUS discovery: MITO_ROS state change by response")
-    out1 = r"results\figures\fig1_mito_ros_delta.png"
-    plt.savefig(out1, dpi=200, bbox_inches="tight")
-    plt.close()
-    print("Saved:", out1)
+    y = pd.to_numeric(df[ycol], errors="coerce").dropna()
 
-    # --- Figure 1b: delta MITO_ROS vs delta fraction inflamed ---
-    x = deltas["delta_frac_inflamed"]
-    y = deltas["delta_pct_high_MITO_ROS"]
+    if "response" in df.columns:
+        groups = ["Non_Remission", "Remission"]
+        df_plot = df.copy()
+        df_plot["response"] = pd.Categorical(df_plot["response"], categories=groups, ordered=True)
 
-    plt.figure()
-    plt.scatter(x, y)
-    plt.axhline(0, linewidth=1)
-    plt.axvline(0, linewidth=1)
-    plt.xlabel("Delta(Post - Pre) fraction inflamed biopsies")
-    plt.ylabel("Delta(Post - Pre) % MITO_ROS-high (myeloid)")
-    plt.title("TAURUS discovery: MITO_ROS change vs inflammation change")
-    out2 = r"results\figures\fig1b_mito_ros_vs_inflammation.png"
-    plt.savefig(out2, dpi=200, bbox_inches="tight")
-    plt.close()
-    print("Saved:", out2)
+        data = []
+        labels = []
+        for g in groups:
+            vals = pd.to_numeric(df_plot.loc[df_plot["response"] == g, ycol], errors="coerce").dropna().astype(float).values
+            data.append(vals)
+            labels.append(g.replace("_", " "))
 
+        ax.boxplot(data, labels=labels, showfliers=True)
+        # Add jitter points (two default colors by plotting each group once)
+        rng = np.random.default_rng(0)
+        for i, vals in enumerate(data, start=1):
+            if len(vals) == 0:
+                continue
+            x = np.full(len(vals), i) + rng.normal(0, 0.05, size=len(vals))
+            ax.scatter(x, vals, s=18, alpha=0.9)
+
+        ax.set_title("TAURUS discovery: MITO/ROS state change by response")
+    else:
+        # Pooled: single box + points
+        ax.boxplot([y.values], labels=["All subjects"], showfliers=True)
+        rng = np.random.default_rng(0)
+        x = np.full(len(y.values), 1.0) + rng.normal(0, 0.05, size=len(y.values))
+        ax.scatter(x, y.values, s=18, alpha=0.9)
+        ax.set_title("TAURUS discovery: MITO/ROS state change (pooled)")
+
+    ax.axhline(0, linewidth=1)
+    ax.set_ylabel("Paired delta (post − baseline): % MITO/ROS-high (myeloid)")
+    ax.text(0.5, 0.98, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
+
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig(OUT_FIG1, dpi=250)
+    print("Wrote:", OUT_FIG1.as_posix())
+
+    # ----------------------------
+    # Figure 1b: MITO/ROS delta vs inflammation delta (color by response if available)
+    # ----------------------------
+    if xcol not in df.columns:
+        print(f"NOTE: {xcol} not found in table; skipping Figure 1b.")
+        return
+
+    x = pd.to_numeric(df[xcol], errors="coerce")
+    y = pd.to_numeric(df[ycol], errors="coerce")
+    mask = x.notna() & y.notna()
+    df_sc = df.loc[mask].copy()
+    df_sc[xcol] = x.loc[mask].astype(float).values
+    df_sc[ycol] = y.loc[mask].astype(float).values
+
+    plt.figure(figsize=(7.2, 5.0))
+    ax = plt.gca()
+
+    if "response" in df_sc.columns:
+        groups = ["Non_Remission", "Remission"]
+        df_sc["response"] = pd.Categorical(df_sc["response"], categories=groups, ordered=True)
+
+        # Plot each group once (Matplotlib assigns default colors automatically)
+        for g, marker in [("Non_Remission", "o"), ("Remission", "s")]:
+            sub = df_sc[df_sc["response"] == g]
+            if len(sub) == 0:
+                continue
+            ax.scatter(sub[xcol], sub[ycol], s=55, marker=marker, alpha=0.9, label=g.replace("_", " "))
+
+        ax.legend(loc="best")
+    else:
+        ax.scatter(df_sc[xcol], df_sc[ycol], s=55, alpha=0.9)
+
+    ax.axhline(0, linewidth=1)
+    ax.axvline(0, linewidth=1)
+
+    ax.set_title("TAURUS discovery: MITO/ROS change vs inflammation change")
+    ax.set_xlabel("Paired delta (post − baseline): fraction inflamed biopsies")
+    ax.set_ylabel("Paired delta (post − baseline): % MITO/ROS-high (myeloid)")
+    ax.text(0.5, 0.98, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
+
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig(OUT_FIG1B, dpi=250)
+    print("Wrote:", OUT_FIG1B.as_posix())
 
 if __name__ == "__main__":
     main()
