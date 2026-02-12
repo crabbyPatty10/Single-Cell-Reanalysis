@@ -44,11 +44,11 @@ This page summarizes the key discovery results and the external validation.
 
 
 
-!\[Fig 1b: mito/ROS vs inflammation](assets/figures/fig1b\_mito\_ros\_vs\_inflammation.png)
+![Fig 1b: mito/ROS vs inflammation](assets/figures/fig1b\_mito\_ros\_vs\_inflammation.png)
 
 
 
-\*\*Takeaways (discovery):\*\*
+**Takeaways (discovery):**
 
 \- The mito/ROS signal is compared against an inflammation-related signal to contextualize biology.
 
@@ -64,11 +64,11 @@ This page summarizes the key discovery results and the external validation.
 
 
 
-!\[Fig 1c: mean ROS delta](assets/figures/fig1c\_delta\_mean\_ROS.png)
+![Fig 1c: mean ROS delta](assets/figures/fig1c\_delta\_mean\_ROS.png)
 
 
 
-!\[Fig 1d: mean OXPHOS delta](assets/figures/fig1d\_delta\_mean\_OXPHOS.png)
+![Fig 1d: mean OXPHOS delta](assets/figures/fig1d\_delta\_mean\_OXPHOS.png)
 
 
 
@@ -92,7 +92,7 @@ This page summarizes the key discovery results and the external validation.
 
 
 
-!\[Fig V1: validation group comparison](assets/figures/figV1\_gse298464\_mito\_ros\_by\_group.png)
+![Fig V1: validation group comparison](assets/figures/figV1\_gse298464\_mito\_ros\_by\_group.png)
 
 
 
