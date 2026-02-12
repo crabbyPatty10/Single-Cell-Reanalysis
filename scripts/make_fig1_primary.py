@@ -32,12 +32,12 @@ def main():
         raise ValueError(f"Missing required column: {ycol} (source: {src})")
 
     # ----------------------------
-    # Figure 1: MITO/ROS-high delta by response (if available) else pooled distribution
+    # Figure 1 (S1): MITO/ROS-high delta by response (if available) else pooled
     # ----------------------------
     plt.figure(figsize=(7.2, 5.0))
     ax = plt.gca()
 
-    y = pd.to_numeric(df[ycol], errors="coerce").dropna()
+    y_all = pd.to_numeric(df[ycol], errors="coerce").dropna()
 
     if "response" in df.columns:
         groups = ["Non_Remission", "Remission"]
@@ -47,31 +47,37 @@ def main():
         data = []
         labels = []
         for g in groups:
-            vals = pd.to_numeric(df_plot.loc[df_plot["response"] == g, ycol], errors="coerce").dropna().astype(float).values
+            vals = pd.to_numeric(
+                df_plot.loc[df_plot["response"] == g, ycol],
+                errors="coerce"
+            ).dropna().astype(float).values
             data.append(vals)
-            labels.append(g.replace("_", " "))
+            labels.append(f"{g.replace('_',' ')} (n={len(vals)})")
 
-        ax.boxplot(data, labels=labels, showfliers=True)
+        # Use tick_labels to avoid matplotlib deprecation warning
+        ax.boxplot(data, tick_labels=labels, showfliers=True)
+
         # Add jitter points (two default colors by plotting each group once)
         rng = np.random.default_rng(0)
         for i, vals in enumerate(data, start=1):
             if len(vals) == 0:
                 continue
             x = np.full(len(vals), i) + rng.normal(0, 0.05, size=len(vals))
-            ax.scatter(x, vals, s=18, alpha=0.9)
+            ax.scatter(x, vals, s=24, alpha=0.9)
 
         ax.set_title("TAURUS discovery: MITO/ROS state change by response")
     else:
         # Pooled: single box + points
-        ax.boxplot([y.values], labels=["All subjects"], showfliers=True)
+        ax.boxplot([y_all.values], tick_labels=["All subjects"], showfliers=True)
         rng = np.random.default_rng(0)
-        x = np.full(len(y.values), 1.0) + rng.normal(0, 0.05, size=len(y.values))
-        ax.scatter(x, y.values, s=18, alpha=0.9)
+        x = np.full(len(y_all.values), 1.0) + rng.normal(0, 0.05, size=len(y_all.values))
+        ax.scatter(x, y_all.values, s=24, alpha=0.9)
         ax.set_title("TAURUS discovery: MITO/ROS state change (pooled)")
 
     ax.axhline(0, linewidth=1)
     ax.set_ylabel("Paired delta (post − baseline): % MITO/ROS-high (myeloid)")
-    ax.text(0.5, 0.98, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
+    # Move subtitle slightly down so it never feels cramped
+    ax.text(0.5, 0.94, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig(OUT_FIG1, dpi=250)
@@ -103,8 +109,14 @@ def main():
             sub = df_sc[df_sc["response"] == g]
             if len(sub) == 0:
                 continue
-            ax.scatter(sub[xcol], sub[ycol], s=55, marker=marker, alpha=0.9, label=g.replace("_", " "))
-
+            ax.scatter(
+                sub[xcol],
+                sub[ycol],
+                s=55,
+                marker=marker,
+                alpha=0.9,
+                label=g.replace("_", " ")
+            )
         ax.legend(loc="best")
     else:
         ax.scatter(df_sc[xcol], df_sc[ycol], s=55, alpha=0.9)
@@ -115,7 +127,7 @@ def main():
     ax.set_title("TAURUS discovery: MITO/ROS change vs inflammation change")
     ax.set_xlabel("Paired delta (post − baseline): fraction inflamed biopsies")
     ax.set_ylabel("Paired delta (post − baseline): % MITO/ROS-high (myeloid)")
-    ax.text(0.5, 0.98, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
+    ax.text(0.5, 0.94, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig(OUT_FIG1B, dpi=250)
