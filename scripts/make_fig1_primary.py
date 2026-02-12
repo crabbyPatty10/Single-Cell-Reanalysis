@@ -12,6 +12,7 @@ FIG_DIR.mkdir(parents=True, exist_ok=True)
 OUT_FIG1 = FIG_DIR / "fig1_mito_ros_delta.png"
 OUT_FIG1B = FIG_DIR / "fig1b_mito_ros_vs_inflammation.png"
 
+
 def load_deltas():
     if TABLE_WITH_META.exists():
         df = pd.read_csv(TABLE_WITH_META, sep="\t")
@@ -20,6 +21,7 @@ def load_deltas():
         df = pd.read_csv(TABLE_BASE, sep="\t")
         src = TABLE_BASE.as_posix()
     return df, src
+
 
 def main():
     df, src = load_deltas()
@@ -49,12 +51,12 @@ def main():
         for g in groups:
             vals = pd.to_numeric(
                 df_plot.loc[df_plot["response"] == g, ycol],
-                errors="coerce"
+                errors="coerce",
             ).dropna().astype(float).values
             data.append(vals)
             labels.append(f"{g.replace('_',' ')} (n={len(vals)})")
 
-        # Use tick_labels to avoid matplotlib deprecation warning
+        # Remove fliers because we already plot all points with scatter
         ax.boxplot(data, tick_labels=labels, showfliers=False)
 
         # Add jitter points (two default colors by plotting each group once)
@@ -76,8 +78,15 @@ def main():
 
     ax.axhline(0, linewidth=1)
     ax.set_ylabel("Paired delta (post − baseline): % MITO/ROS-high (myeloid)")
-    # Move subtitle slightly down so it never feels cramped
-    ax.text(0.5, 0.94, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
+    ax.text(
+        0.5,
+        0.94,
+        "Paired delta = post − baseline",
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=2),
+    )
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig(OUT_FIG1, dpi=250)
@@ -115,7 +124,7 @@ def main():
                 s=55,
                 marker=marker,
                 alpha=0.9,
-                label=g.replace("_", " ")
+                label=g.replace("_", " "),
             )
         ax.legend(loc="best")
     else:
@@ -127,11 +136,20 @@ def main():
     ax.set_title("TAURUS discovery: MITO/ROS change vs inflammation change")
     ax.set_xlabel("Paired delta (post − baseline): fraction inflamed biopsies")
     ax.set_ylabel("Paired delta (post − baseline): % MITO/ROS-high (myeloid)")
-    ax.text(0.5, 0.94, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
+    ax.text(
+        0.5,
+        0.94,
+        "Paired delta = post − baseline",
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=2),
+    )
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig(OUT_FIG1B, dpi=250)
     print("Wrote:", OUT_FIG1B.as_posix())
+
 
 if __name__ == "__main__":
     main()
