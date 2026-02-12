@@ -92,13 +92,18 @@ def main():
     ax.axhline(0, linewidth=1)
     ax.set_ylabel("Post − baseline (paired delta)")
     ax.set_title(f"Discovery: paired deltas by response group (n={n_non} Non_Remission, n={n_rem} Remission)")
-    ax.text(0.5, 1.02, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="bottom")
+
+    # Subtitle INSIDE axes so it never overlaps the title
+    ax.text(0.5, 0.98, "Paired delta = post − baseline", transform=ax.transAxes, ha="center", va="top")
 
     ax.set_xticks(centers)
-    ax.set_xticklabels([LABELS.get(m, m.replace("delta_", "")) for m in metrics], rotation=15, ha="right")
+    ax.set_xticklabels([LABELS.get(m, m.replace('delta_', '')) for m in metrics], rotation=15, ha="right")
 
     ax.legend(loc="best")
-    plt.tight_layout()
+
+    # Leave extra headroom for the title
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+
     plt.savefig(OUT_PNG, dpi=250)
     print("Wrote:", OUT_PNG.as_posix())
 
